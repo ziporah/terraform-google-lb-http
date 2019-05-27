@@ -83,7 +83,7 @@ resource "google_compute_backend_service" "default" {
   port_name       = "${element(split(",", element(var.backend_params, count.index)), 1)}"
   protocol        = "${var.backend_protocol}"
   timeout_sec     = "${element(split(",", element(var.backend_params, count.index)), 3)}"
-  backend         ["${var.backends["${count.index}"]}"]
+  backend         = var.backends["${count.index}"]
   health_checks   = ["${element(google_compute_http_health_check.default.*.self_link, count.index)}"]
   security_policy = "${var.security_policy}"
   enable_cdn      = "${var.cdn}"
@@ -104,7 +104,7 @@ resource "google_compute_firewall" "default-hc" {
   name          = "${var.name}-hc-${count.index}"
   network       = "${element(var.firewall_networks, count.index)}"
   source_ranges = ["130.211.0.0/22", "35.191.0.0/16", "209.85.152.0/22", "209.85.204.0/22"]
-  target_tags   ["${var.target_tags}"]
+  target_tags   = var.target_tags
 
   allow {
     protocol = "tcp"
