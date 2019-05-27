@@ -18,7 +18,7 @@ resource "google_compute_global_forwarding_rule" "http" {
   project    = "${var.project}"
   count      = "${var.http_forward ? 1 : 0}"
   name       = "${var.name}"
-  target     = "${google_compute_target_http_proxy.default[*].self_link}"
+  target     = "${google_compute_target_http_proxy.default[0].self_link}"
   ip_address = "${google_compute_global_address.default.address}"
   port_range = "80"
   depends_on = ["google_compute_global_address.default"]
@@ -114,6 +114,7 @@ resource "google_compute_firewall" "default-hc" {
 
   allow {
     protocol = "tcp"
-    ports    = ["${element(split(",", element(split("|", join("", list(join("|", var.backend_params), replace(format("%*s", length(var.backend_params), ""), " ", "|")))), count.index)), 2)}"]
+#     ports    = ["${element(split(",", element(split("|", join("", list(join("|", var.backend_params), replace(format("%*s", length(var.backend_params), ""), " ", "|")))), count.index)), 2)}"]
+    ports    = ["${element(split(",", element(var.backend_params, count.index)), 2)}"]
   }
 }
