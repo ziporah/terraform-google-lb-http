@@ -18,7 +18,7 @@ resource "google_compute_global_forwarding_rule" "http" {
   project    = "${var.project}"
   count      = "${var.http_forward ? 1 : 0}"
   name       = "${var.name}"
-  target     = "${google_compute_target_http_proxy.default.self_link}"
+  target     = "${google_compute_target_http_proxy.default[count.index]}"
   ip_address = "${google_compute_global_address.default.address}"
   port_range = "80"
   depends_on = ["google_compute_global_address.default"]
@@ -28,7 +28,8 @@ resource "google_compute_global_forwarding_rule" "https" {
   project    = "${var.project}"
   count      = "${var.ssl ? 1 : 0}"
   name       = "${var.name}-https"
-  target     = "${google_compute_target_https_proxy.default.self_link}"
+  target     = "${google_compute_target_https_proxy.default[count.index]}"
+  target     = "${google_compute_target_https_proxy.default[count.index]}"
   ip_address = "${google_compute_global_address.default.address}"
   port_range = "443"
   depends_on = ["google_compute_global_address.default"]
@@ -54,7 +55,7 @@ resource "google_compute_target_https_proxy" "default" {
   count            = "${var.ssl ? 1 : 0}"
   name             = "${var.name}-https-proxy"
   url_map          = "${element(compact(concat(list(var.url_map), google_compute_url_map.default.*.self_link)), 0)}"
-  ssl_certificates = ["${compact(concat(var.ssl_certificates, google_compute_ssl_certificate.default.*.self_link))}"]
+  ssl_certificates = compact(concat(var.ssl_certificates, google_compute_ssl_certificate.default.*.self_link))
 }
 
 resource "google_compute_ssl_certificate" "default" {
@@ -77,13 +78,19 @@ resource "google_compute_url_map" "default" {
 }
 
 resource "google_compute_backend_service" "default" {
+  count           = length(var.backends)
   project         = "${var.project}"
   count           = "${length(var.backend_params)}"
   name            = "${var.name}-backend-${count.index}"
   port_name       = "${element(split(",", element(var.backend_params, count.index)), 1)}"
   protocol        = "${var.backend_protocol}"
   timeout_sec     = "${element(split(",", element(var.backend_params, count.index)), 3)}"
-  backend         = var.backends[*]
+  dynamic "backend" {
+    for_each = var.backends[count.index]
+    content {
+      backend.value
+      }
+  }
   health_checks   = ["${element(google_compute_http_health_check.default.*.self_link, count.index)}"]
   security_policy = "${var.security_policy}"
   enable_cdn      = "${var.cdn}"
