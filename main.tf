@@ -64,7 +64,7 @@ resource "google_compute_ssl_certificate" "default" {
   private_key = "${var.private_key}"
   certificate = "${var.certificate}"
 
-  lifecycle = {
+  lifecycle {
     create_before_destroy = true
   }
 }
