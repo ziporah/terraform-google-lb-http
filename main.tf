@@ -85,7 +85,7 @@ resource "google_compute_backend_service" "default" {
   protocol        = "${var.backend_protocol}"
   timeout_sec     = "${element(split(",", element(var.backend_params, count.index)), 3)}"
   dynamic "backend" {
-    for_each = var.backends[count.index]
+    for_each = var.backends[count1.index]
     content {
       backend.value
       }
