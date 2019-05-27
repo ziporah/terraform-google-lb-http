@@ -77,7 +77,6 @@ resource "google_compute_url_map" "default" {
 }
 
 resource "google_compute_backend_service" "default" {
-  count           = length(var.backends)
   project         = "${var.project}"
   count           = "${length(var.backend_params)}"
   name            = "${var.name}-backend-${count.index}"
