@@ -86,8 +86,17 @@ resource "google_compute_backend_service" "default" {
   dynamic "backend" {
     for_each        = var.backends[count.index]
     content {
-      group = backend.value["group"]
+      description = lookup (backend.value, "description", null)
+      group = lookup ( backend.value, "group", null )
+      balancing_mode = lookup ( backend.value, "balancing_mode", null )
+      max_utilization = lookup ( backend.value, "max_utilization", null )
       max_rate = lookup (backend.value, "max_rate", null)
+      max_rate_per_instance = lookup ( backend.value, "max_rate_per_instance", null )
+      max_rate_per_endpoint = lookup ( backend.value, "max_rate_per_endpoint", null )
+      max_connections = lookup ( backend.value, "max_connections", null )
+      max_connections_per_instance = lookup ( backend.value, "max_connections_per_instance", null )
+      max_connections_per_endpoint = lookup ( backend.value, "max_connections_per_endpoint", null )
+      capacity_scaler = lookup ( backend.value, "capacity_scaler", null )
     }
   }
   health_checks   = ["${element(google_compute_http_health_check.default.*.self_link, count.index)}"]
