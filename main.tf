@@ -92,10 +92,12 @@ resource "google_compute_backend_service" "default" {
       max_utilization = lookup ( backend.value, "max_utilization", null )
       max_rate = lookup (backend.value, "max_rate", null)
       max_rate_per_instance = lookup ( backend.value, "max_rate_per_instance", null )
-      max_rate_per_endpoint = lookup ( backend.value, "max_rate_per_endpoint", null )
+//    Not yet supported by terraform module
+//      max_rate_per_endpoint = lookup ( backend.value, "max_rate_per_endpoint", null )
       max_connections = lookup ( backend.value, "max_connections", null )
       max_connections_per_instance = lookup ( backend.value, "max_connections_per_instance", null )
-      max_connections_per_endpoint = lookup ( backend.value, "max_connections_per_endpoint", null )
+//    Not yet supported by terraform module
+//      max_connections_per_endpoint = lookup ( backend.value, "max_connections_per_endpoint", null )
       capacity_scaler = lookup ( backend.value, "capacity_scaler", null )
     }
   }
